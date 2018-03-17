@@ -1,0 +1,8 @@
+<p>
+  user-list works!
+</p>
+<div *ngFor='let user of userList$ | async'> {{user.userid}} 
+  <a routerLink="/user/{{user.userid}}">
+    {{user.owner.name}} {{user.owner.surname}}
+  </a>
+</div>
