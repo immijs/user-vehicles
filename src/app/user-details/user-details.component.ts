@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
+import { OwnerComponent } from '../owner/owner.component';
 import { UserListService } from '../user-list.service';
 import { User } from '../shared/user.model';
 
 @Component({
-  selector: 'app-user-details',
+  selector: 'user-details',
   templateUrl: './user-details.component.html',
   styleUrls: ['./user-details.component.css']
 })
@@ -24,5 +25,4 @@ export class UserDetailsComponent implements OnInit {
     console.log(`id: ${id}`);
     this.user = this.userListService.getUser(id);
   }
-
 }

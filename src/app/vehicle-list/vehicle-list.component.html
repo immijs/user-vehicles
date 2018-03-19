@@ -1,3 +1,5 @@
-<p>
-  vehicle-list works!
-</p>
+<mat-nav-list>
+  <mat-list-item *ngFor="let vehicle of vehicles" (click)="selectVehicle(vehicle)">
+     {{vehicle.make}} {{vehicle.model}} ({{vehicle.year}})
+  </mat-list-item>
+</mat-nav-list>

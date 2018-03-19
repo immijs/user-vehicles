@@ -1,4 +1,7 @@
-<p>
-  user-details works!
-</p>
-<p>{{user.owner.name}} {{user.owner.surname}}</p>
+<div fxLayout="row" fxLayoutAlign="space-around center">
+  <div fxLayout="column">
+    <owner [owner]="user.owner"></owner>
+    <vehicle-list [vehicles]="user.vehicles" (vehicleSelected)="setSelectedVehicle($event)"></vehicle-list>
+  </div>
+  <vehicle-map [vehicles]="user.vehicles"></vehicle-map>
+</div>
