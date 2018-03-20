@@ -8,17 +8,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MaterialModule } from './material.module';
-
-import { UserDetailsComponent } from './user-details/user-details.component';
-import { OwnerComponent } from './owner/owner.component';
-import { UserListComponent } from './user-list/user-list.component';
+import { MessageService } from './message.service';
 import { UserListService } from './user-list.service';
+
+import { MessageComponent } from './message/message.component';
+import { OwnerComponent } from './owner/owner.component';
+import { UserDetailsComponent } from './user-details/user-details.component';
+import { UserListComponent } from './user-list/user-list.component';
 import { VehicleListComponent } from './vehicle-list/vehicle-list.component';
 import { VehicleMapComponent } from './vehicle-map/vehicle-map.component';
 
 @NgModule({
   declarations: [
     AppComponent,
+    MessageComponent,
     OwnerComponent,
     UserListComponent,
     UserDetailsComponent,
@@ -35,7 +38,7 @@ import { VehicleMapComponent } from './vehicle-map/vehicle-map.component';
     AppRoutingModule,
     MaterialModule
   ],
-  providers: [UserListService],
+  providers: [UserListService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
