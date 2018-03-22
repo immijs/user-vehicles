@@ -19,7 +19,7 @@ export class AppComponent implements OnInit {
     this.messageService.getDisplayMessages().subscribe((message: Message) => {
       console.log(message.text);
       this.snackBar.open(message.text, 'Hide', {
-        duration: 5000
+        duration: 3000
       });
     });
   }

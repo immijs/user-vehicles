@@ -18,16 +18,21 @@ import { VehicleLocation } from './shared/vehicle-location.model';
 export class UserListService {
   private readonly userListExpiryMilliseconds: number = 5 * 60 * 1000;
   private userListCache: CacheItem<Observable<User[]>>;
-  
+
   constructor(private http: HttpClient, private messageService: MessageService) { }
 
   getUserList(): Observable<User[]> {
     try {
-    let time: Date = new Date();
-    let url: string = 'http://mobi.connectedcar360.net/api/?op=list';
+      this.messageService.addMessage(new Message(`user list requested`));
+
+      let time: Date = new Date();
+      let url: string = 'http://mobi.connectedcar360.net/api/?op=list';
 
       if (this.userListCache == null || this.userListCache.expires <= time) {
         time.setMilliseconds(time.getMilliseconds() + this.userListExpiryMilliseconds);
+
+        this.messageService.addMessage(new Message(`user list pulled from api`));
+
         this.userListCache = {
           expires: time,
           item: this.http.get<{ data: User[] }>(url)
@@ -37,26 +42,31 @@ export class UserListService {
             .refCount()
         };
       }
-    return this.userListCache.item;
+      return this.userListCache.item;
     }
     catch (e) {
       console.error(e);
-      this.messageService.addDisplayMessage(new Message(`Failed reading user list`));
+      this.messageService.addDisplayMessage(new Message(`failed reading user list`));
     }
   }
 
   getUser(userid: number): Observable<User> {
     try {
+      this.messageService.addMessage(new Message(`user requested (userid:${userid})`));
+
       return this.getUserList().map((users) => {
         let filtered = users.filter(u => u.userid == userid);
         if (filtered.length > 0)
           return filtered[0];
-        throw new Error(`User (userid:${userid}) not found!`);
+
+        let message = new Message(`user (userid:${userid}) not found!`);
+        this.messageService.addMessage(message);
+        throw new Error(message.text);
       });
     }
     catch (e) {
+      this.messageService.addDisplayMessage(new Message(`failed reading user (userid:${userid})`));
       console.error(e);
-      this.messageService.addDisplayMessage(new Message(`Failed reading user (userid:${userid})`));
     }
   }
 }

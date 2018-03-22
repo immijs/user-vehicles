@@ -14,7 +14,7 @@ export class VehicleService {
   @Output('vehicleSelected') vehicleSelected: EventEmitter<Vehicle> = new EventEmitter<Vehicle>();
 
   private readonly vehicleLocationsExpiryMilliseconds: number = 30 * 1000;
-  private vehicleLocationCache: Map<string, CacheItem<Observable<VehicleLocation[]>>> = new Map<string, CacheItem<Observable<VehicleLocation[]>>>();
+  private vehicleLocationCache = new Map<string, CacheItem<Observable<VehicleLocation[]>>>();
 
   constructor(private http: HttpClient, private messageService: MessageService) {
   }
@@ -26,11 +26,15 @@ export class VehicleService {
 
   public getUserVehicleLocation(userid: number): Observable<VehicleLocation[]> {
     try {
+      this.messageService.addMessage(new Message(`vehicle locations requested (userid:${userid})`));
+
       let time: Date = new Date();
       let url: string = `http://mobi.connectedcar360.net/api/?op=getlocations&userid=${userid}`;
       let cacheItem = this.vehicleLocationCache.get(url);
 
       if (cacheItem == null || cacheItem.expires <= time) {
+        this.messageService.addMessage(new Message(`vehicle locations pulled from api (userid:${userid})`));
+
         time.setMilliseconds(time.getMilliseconds() + this.vehicleLocationsExpiryMilliseconds);
 
         cacheItem = {
@@ -48,8 +52,8 @@ export class VehicleService {
       return cacheItem.item;
     }
     catch (e) {
+      this.messageService.addDisplayMessage(new Message(`failed reading vehicle locations (userid:${userid})`));
       console.error(e);
-      this.messageService.addDisplayMessage(new Message(`Failed reading user vehicle locations`));
     }
   }
 }

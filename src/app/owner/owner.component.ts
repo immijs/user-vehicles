@@ -16,5 +16,4 @@ export class OwnerComponent implements OnInit {
 
   ngOnInit() {
   }
-
 }
