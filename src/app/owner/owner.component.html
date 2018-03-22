@@ -1,6 +1,4 @@
-<mat-card class="example-card">
-    <mat-card-header>
-      <img mat-card-avatar [src]="owner.foto"/>
-      <mat-card-title>{{owner.name}} {{owner.surname}}</mat-card-title>
-    </mat-card-header>
-  </mat-card>
+<div *ngIf="owner != null" class="container">
+    <h4>{{owner?.name}} {{owner?.surname}}</h4>
+    <img [src]="owner.foto" class="profile-picture" />
+</div>

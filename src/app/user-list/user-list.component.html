@@ -1,8 +1,14 @@
-<p>
-  user-list works!
-</p>
-<div *ngFor='let user of userList$ | async'> {{user.userid}} 
-  <a routerLink="/user/{{user.userid}}">
-    {{user.owner.name}} {{user.owner.surname}}
-  </a>
-</div>
+<mat-card class="container" fxLayout="column" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+  <h3 mat-subheader>Users</h3>
+
+
+  <div *ngFor='let user of userList$ | async' routerLink="/user/{{user.userid}}">
+    <div fxLayout="row" fxLayoutAlign="start center">
+      <img class="round-image" [src]="user.owner.foto">
+      <h3> {{user?.owner?.name}} {{user?.owner?.surname}} </h3>
+      <span> {{user?.vehicles?.length}} vehicle(s) </span>
+    </div>
+    <mat-divider></mat-divider>
+  </div>
+
+</mat-card>

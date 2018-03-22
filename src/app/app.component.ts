@@ -17,8 +17,9 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.messageService.getDisplayMessages().subscribe((message: Message) => {
+      console.log(message.text);
       this.snackBar.open(message.text, 'Hide', {
-        duration: 10000
+        duration: 5000
       });
     });
   }

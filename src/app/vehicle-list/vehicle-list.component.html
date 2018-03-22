@@ -1,5 +1,9 @@
 <mat-nav-list>
-  <mat-list-item *ngFor="let vehicle of vehicles" (click)="selectVehicle(vehicle)">
-     {{vehicle.make}} {{vehicle.model}} ({{vehicle.year}})
+  <mat-list-item *ngFor="let vehicle of vehicles" (click)="selectVehicle(vehicle)" fxLayout="row" fxLayoutAlign="start center">
+    <div class="color-box" [ngStyle]="{'background-color': vehicle.color}">
+    </div>
+    <div>
+      {{vehicle.make}} {{vehicle.model}} ({{vehicle.year}})
+    </div>
   </mat-list-item>
 </mat-nav-list>

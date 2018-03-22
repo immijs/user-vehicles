@@ -1,7 +1,9 @@
-<div fxLayout="row" fxLayoutAlign="space-around center">
-  <div fxLayout="column">
-    <owner [owner]="user.owner"></owner>
-    <vehicle-list [vehicles]="user.vehicles" (vehicleSelected)="setSelectedVehicle($event)"></vehicle-list>
-  </div>
-  <vehicle-map [vehicles]="user.vehicles"></vehicle-map>
+<div class="container" fxLayout="row" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+  <mat-card fxLayout="column" fxLayoutGap="20px" fxFlex="25">
+    <owner [owner]="(user$ | async)?.owner"></owner>
+    <vehicle-list [vehicles]="(user$ | async)?.vehicles"></vehicle-list>
+  </mat-card>
+  <mat-card fxFlex>
+    <vehicle-map [user]="(user$ | async)"></vehicle-map>
+  </mat-card>
 </div>

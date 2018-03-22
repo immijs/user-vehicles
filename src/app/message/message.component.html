@@ -1,3 +1,6 @@
-<p>
-  message works!
-</p>
+<div>
+  <div *ngFor="let message of messages$ | async" fxLayoutGap="10px">
+    <span>{{message.time | date : 'dd-MMM HH:mm:ss'}}</span>
+    <span>{{message.text}}</span>
+  </div>
+</div>

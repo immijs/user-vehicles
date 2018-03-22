@@ -1,0 +1,6 @@
+.color-box {
+  min-width: 15px;
+  min-height: 15px;
+  margin: 2px 15px 2px 0px;
+  border: 1px solid black;
+}

@@ -1,8 +1,9 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
-import { Input, Output } from '@angular/core';
+import { NgStyle } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { } from '@angular/core';
 
 import { Vehicle } from '../shared/vehicle.model';
-import { UserListService } from '../user-list.service';
+import { VehicleService } from '../vehicle.service';
 
 @Component({
   selector: 'vehicle-list',
@@ -12,14 +13,13 @@ import { UserListService } from '../user-list.service';
 export class VehicleListComponent implements OnInit {
   @Input('vehicles') vehicles: Vehicle[];
 
-  constructor(private userListService: UserListService) {
-    
+  constructor(private vehicleService: VehicleService) {  
   }
 
   ngOnInit() {
   }
 
   private selectVehicle(vehicle: Vehicle): void {
-    this.userListService.selectVehicle(vehicle);
+    this.vehicleService.selectVehicle(vehicle);
   }
 }

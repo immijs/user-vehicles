@@ -17,6 +17,7 @@ import { UserDetailsComponent } from './user-details/user-details.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { VehicleListComponent } from './vehicle-list/vehicle-list.component';
 import { VehicleMapComponent } from './vehicle-map/vehicle-map.component';
+import { VehicleService } from './vehicle.service';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,7 @@ import { VehicleMapComponent } from './vehicle-map/vehicle-map.component';
     AppRoutingModule,
     MaterialModule
   ],
-  providers: [UserListService, MessageService],
+  providers: [UserListService, MessageService, VehicleService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

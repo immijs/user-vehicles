@@ -1,0 +1,25 @@
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+html, body {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.container {
+  margin: 10px;
+}
+
+.round-image {
+  border-radius: 25px;
+  height: 50px;
+  width: 50px;
+  object-fit: cover;
+}
+
+.profile-picture {
+  border-radius: 0px;
+  border-style: double;
+  height: 80px;
+  width: 80px;
+  object-fit: cover;
+}

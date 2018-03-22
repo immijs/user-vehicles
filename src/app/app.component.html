@@ -1,9 +1,11 @@
 <!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <mat-toolbar>
-    <span>User vehicle map</span>
+<div fxLayout="column" fxLayoutAlign="start stretch">
+  <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
     <button mat-icon-button color="primary" routerLink="/users">
       <mat-icon aria-label="Return home">home</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" routerLink="/log">
+      <mat-icon aria-label="Show messages">history</mat-icon>
     </button>
   </mat-toolbar>
   <router-outlet></router-outlet>

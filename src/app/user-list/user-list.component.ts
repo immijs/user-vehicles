@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs/Observable';
 
 import { UserListService } from '../user-list.service';
@@ -14,9 +15,6 @@ export class UserListComponent implements OnInit {
   constructor(private userListService: UserListService) { }
 
   ngOnInit() {
-    console.log(1);
     this.userList$ = this.userListService.getUserList();
-    console.log(2);
   }
-
 }

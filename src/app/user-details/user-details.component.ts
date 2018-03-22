@@ -1,8 +1,10 @@
+import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Observable } from 'rxjs';
 
-import { OwnerComponent } from '../owner/owner.component';
 import { UserListService } from '../user-list.service';
+import { OwnerComponent } from '../owner/owner.component';
 import { User } from '../shared/user.model';
 
 @Component({
@@ -11,18 +13,12 @@ import { User } from '../shared/user.model';
   styleUrls: ['./user-details.component.css']
 })
 export class UserDetailsComponent implements OnInit {
-  private user: User;
+  private user$: Observable<User>;
 
   constructor(private route: ActivatedRoute, private userListService: UserListService) { }
 
   ngOnInit(): void {
-    this.getUser();
-  }
-
-  getUser(): void {
-    console.log('getUser');
     const id = parseInt(this.route.snapshot.paramMap.get('id'));
-    console.log(`id: ${id}`);
-    this.user = this.userListService.getUser(id);
+    this.user$ = this.userListService.getUser(id);
   }
 }
