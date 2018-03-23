@@ -24,7 +24,7 @@ export class VehicleService {
     this.vehicleSelected.emit(vehicle);
   }
 
-  public getUserVehicleLocation(userid: number): Observable<VehicleLocation[]> {
+  public getUserVehicleLocations(userid: number): Observable<VehicleLocation[]> {
     try {
       this.messageService.addMessage(new Message(`vehicle locations requested (userid:${userid})`));
 
