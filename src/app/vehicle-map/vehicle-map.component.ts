@@ -14,12 +14,12 @@ import OlLayerVector from 'ol/layer/vector';
 import OlMap from 'ol/map';
 import OlProj from 'ol/proj';
 import OlOSM from 'ol/source/osm';
+import OlOverlay from 'ol/overlay';
 import OlSourceVector from 'ol/source/vector';
-//import OlStyleCircle from 'ol/style/circle';
-import OlStyleStyle from 'ol/style/style';
 import OlStyleCircle from 'ol/style/circle';
 import OlStyleFill from 'ol/style/fill';
 import OlStyleStroke from 'ol/style/stroke';
+import OlStyleStyle from 'ol/style/style';
 import OlView from 'ol/view';
 
 import { User } from '../shared/user.model';
@@ -37,10 +37,12 @@ import { locateHostElement } from '@angular/core/src/render3/instructions';
   styleUrls: ['./vehicle-map.component.css']
 })
 export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
-  public map: OlMap;
-  public source: OlOSM;
-  public layer: OlTileLayer;
-  public view: OlView;
+  private map: OlMap;
+  private source: OlOSM;
+  private layer: OlTileLayer;
+  private view: OlView;
+  private popup: OlOverlay;
+  private locationsVector: OlLayerVector = [];
 
   private vehicleSelected$: Subject<Vehicle>;
   private vehiclePullTimer$: Subscription;
@@ -71,7 +73,7 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
 
       console.log(locationFeatures);
 
-      new OlLayerVector({
+      this.locationsVector = new OlLayerVector({
         map: this.map,
         source: new OlSourceVector({
           features: locationFeatures
@@ -103,14 +105,56 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
       layers: [this.layer],
       view: this.view
     });
-  }
 
+    this.map.on('click', (event) => this.mapClicked(event));
+    
+    this.popup = new OlOverlay({
+      element: document.getElementById('popup')
+    });
+
+    this.map.addOverlay(this.popup);
+  }
+  
   private initVehicleSelected() {
     this.vehicleSelected$ = this.vehicleService.vehicleSelected.subscribe((vehicle: Vehicle) => {
-      let location = this.getVehicleLocation(vehicle.vehicleid);
-      let cartesian = OlProj.fromLonLat([location.lon, location.lat]);
-      this.view.animate({ center: cartesian, zoom: 12 });
+      let vehicleLocation = this.getVehicleLocation(vehicle.vehicleid);
+      let coordinate = OlProj.fromLonLat([vehicleLocation.lon, vehicleLocation.lat]);
+
+      this.view.animate({ center: coordinate, zoom: 12 });
+
+      let pixel = this.map.getPixelFromCoordinate(coordinate);
+      let features: OlFeature = this.map.getFeaturesAtPixel(pixel);
+      if (features != null && features.length > 0) {
+        this.highlightFeature(features[0]);
+      }
     });
+  }
+
+  private mapClicked(event): void {
+    let features: OlFeature[] = this.map.getFeaturesAtPixel(event.pixel);
+    if (features != null && features.length > 0) {
+      this.highlightFeature(features[0]);
+    }
+    else {
+      this.popup.setPosition(undefined);
+    }
+  }
+
+  private highlightFeature(feature: OlFeature) {
+    let element = this.popup.getElement();
+    let location = feature['test-location'] as VehicleLocation;
+    element.innerHTML = `vehicleid:${feature.getId()}`;
+
+    let point: OlGeomPoint = <OlGeomPoint>feature.getGeometry();
+    let coordinate = point.getCoordinates();
+    let pixel = this.map.getPixelFromCoordinate(coordinate);
+
+    this.popup.setPositioning(this.getPopupPositioning(pixel));
+    this.popup.setPosition(coordinate);
+  }
+
+  private getPopupPositioning(pixel) {
+    return 'top-left';
   }
 
   ngOnDestroy() {
@@ -121,6 +165,9 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
 
   private getVehicleLocationFeature(location: VehicleLocation): OlFeature {
     let feature = new OlFeature();
+
+    feature.setId(location.vehicleid);
+    feature['test-location'] = location;
 
     feature.setStyle(new OlStyleStyle({
       image: new OlStyleCircle({
@@ -135,9 +182,9 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
       })
     }));
 
-    let coordinates = OlProj.fromLonLat([location.lon, location.lat]);
-    feature.setGeometry(new OlGeomPoint(coordinates));
-    
+    let coordinate = OlProj.fromLonLat([location.lon, location.lat]);
+    feature.setGeometry(new OlGeomPoint(coordinate));
+
     return feature;
   }
 }
