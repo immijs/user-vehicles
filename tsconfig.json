@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "target": "es5",
     "typeRoots": [
+      "asdsrc/@types",
       "node_modules/@types"
     ],
     "lib": [

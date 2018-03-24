@@ -30,6 +30,7 @@ import { VehicleLocation } from '../shared/vehicle-location.model';
 import { Message } from '../shared/message.model';
 import { MessageService } from '../message.service';
 import { locateHostElement } from '@angular/core/src/render3/instructions';
+import { OverlayPositioning } from 'openlayers';
 
 @Component({
   selector: 'vehicle-map',
@@ -42,7 +43,7 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
   private layer: OlTileLayer;
   private view: OlView;
   private popup: OlOverlay;
-  private locationsVector: OlLayerVector = [];
+  private locationsVector: OlLayerVector;
 
   private vehicleSelected$: Subject<Vehicle>;
   private vehiclePullTimer$: Subscription;
@@ -123,7 +124,7 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
       this.view.animate({ center: coordinate, zoom: 12 });
 
       let pixel = this.map.getPixelFromCoordinate(coordinate);
-      let features: OlFeature = this.map.getFeaturesAtPixel(pixel);
+      let features: OlFeature[] = this.map.getFeaturesAtPixel(pixel) as OlFeature[];
       if (features != null && features.length > 0) {
         this.highlightFeature(features[0]);
       }
@@ -131,7 +132,7 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
   }
 
   private mapClicked(event): void {
-    let features: OlFeature[] = this.map.getFeaturesAtPixel(event.pixel);
+    let features: OlFeature[] = this.map.getFeaturesAtPixel(event.pixel) as OlFeature[];
     if (features != null && features.length > 0) {
       this.highlightFeature(features[0]);
     }
@@ -153,7 +154,7 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
     this.popup.setPosition(coordinate);
   }
 
-  private getPopupPositioning(pixel) {
+  private getPopupPositioning(pixel): OverlayPositioning {
     return 'top-left';
   }
 
