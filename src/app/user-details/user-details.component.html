@@ -1,7 +1,10 @@
-<div class="container" fxLayout="row" fxLayoutAlign="start stretch" fxLayoutGap="20px">
+<div class="container mat-typography" fxLayout="row" fxLayoutGap="20px" fxFlex>
   <mat-card fxLayout="column" fxLayoutGap="20px" fxFlex="25">
-    <owner [owner]="(user$ | async)?.owner"></owner>
-    <vehicle-list [vehicles]="(user$ | async)?.vehicles"></vehicle-list>
+    <div>
+      <owner [owner]="(user$ | async)?.owner"></owner>
+      <mat-divider></mat-divider>
+      <vehicle-list [vehicles]="(user$ | async)?.vehicles"></vehicle-list>
+    </div>
   </mat-card>
   <mat-card fxFlex>
     <vehicle-map [user]="(user$ | async)"></vehicle-map>

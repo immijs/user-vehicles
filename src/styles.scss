@@ -1,12 +1,27 @@
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+$vehicle-map-primary: mat-palette($mat-red, 700, 300, 900);
+$vehicle-map-accent: mat-palette($mat-grey, 200, 100, 400);
+
+$vehicle-map-theme: mat-light-theme($vehicle-map-primary, $vehicle-map-accent);
+@include angular-material-theme($vehicle-map-theme);
 
 html, body {
-  max-width: 1200px;
+  width: 1200px;
+  height: 100%;
   margin: 0 auto;
+  padding: 0;
 }
 
 .container {
   margin: 10px;
+}
+
+user-list, user-details {
+  height: 100%;
+  max-height: 100%;
 }
 
 .round-image {
@@ -16,10 +31,18 @@ html, body {
   object-fit: cover;
 }
 
-.profile-picture {
-  border-radius: 0px;
-  border-style: double;
-  height: 80px;
-  width: 80px;
-  object-fit: cover;
+
+.img-container {
+  width: 100%;
+  height: auto;
+}
+
+.img-container img {
+  max-width: 100%;
+  height: auto;
+}
+
+.text-container {
+  width: 100%;
+  padding: 4px;
 }

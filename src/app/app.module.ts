@@ -19,6 +19,7 @@ import { UserListComponent } from './user-list/user-list.component';
 import { VehicleListComponent } from './vehicle-list/vehicle-list.component';
 import { VehicleMapComponent } from './vehicle-map/vehicle-map.component';
 import { VehicleService } from './vehicle.service';
+import { VehicleOverlayComponent } from './vehicle-overlay/vehicle-overlay.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { VehicleService } from './vehicle.service';
     UserListComponent,
     UserDetailsComponent,
     VehicleListComponent,
-    VehicleMapComponent
+    VehicleMapComponent,
+    VehicleOverlayComponent
   ],
   imports: [
     BrowserModule,

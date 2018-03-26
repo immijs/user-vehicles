@@ -10,7 +10,8 @@ import { User } from '../shared/user.model';
 @Component({
   selector: 'user-details',
   templateUrl: './user-details.component.html',
-  styleUrls: ['./user-details.component.css']
+  styleUrls: ['./user-details.component.css'],
+  host: { class: 'myClass' }
 })
 export class UserDetailsComponent implements OnInit {
   private user$: Observable<User>;

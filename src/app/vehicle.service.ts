@@ -8,6 +8,7 @@ import { Message } from './shared/message.model';
 import { Vehicle } from './shared/vehicle.model';
 import { VehicleLocation } from './shared/vehicle-location.model';
 import { User } from './shared/user.model';
+import { Address } from './shared/address.model';
 
 @Injectable()
 export class VehicleService {
@@ -25,11 +26,11 @@ export class VehicleService {
   }
 
   public getUserVehicleLocations(userid: number): Observable<VehicleLocation[]> {
-    try {
-      this.messageService.addMessage(new Message(`vehicle locations requested (userid:${userid})`));
+    this.messageService.addMessage(new Message(`vehicle locations requested (userid:${userid})`));
+    let url: string = `http://mobi.connectedcar360.net/api/?op=getlocations&userid=${userid}`;
 
+    try {
       let time: Date = new Date();
-      let url: string = `http://mobi.connectedcar360.net/api/?op=getlocations&userid=${userid}`;
       let cacheItem = this.vehicleLocationCache.get(url);
 
       if (cacheItem == null || cacheItem.expires <= time) {
@@ -41,7 +42,7 @@ export class VehicleService {
           expires: time,
           item: this.http.get<{ data: VehicleLocation[] }>(url)
             .retry(3)
-            .map(o => o.data)
+            .map(o => o.data.filter(l => l.lat != null && l.lon != null))
             .publishReplay(1, this.vehicleLocationsExpiryMilliseconds)
             .refCount()
         };
@@ -52,8 +53,16 @@ export class VehicleService {
       return cacheItem.item;
     }
     catch (e) {
+      if (this.vehicleLocationCache.has(url))
+        this.vehicleLocationCache.delete(url);
+
       this.messageService.addDisplayMessage(new Message(`failed reading vehicle locations (userid:${userid})`));
       console.error(e);
     }
+  }
+
+  public getAddress(lat: number, lon: number): Observable<Address> {
+    let url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=0&lat=${lat}&lon=${lon}`;
+    return this.http.get<Address>(url);
   }
 }

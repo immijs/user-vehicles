@@ -1,0 +1,10 @@
+<mat-card *ngIf="vehicleLocation" class="overlay-container" fxLayout="column" fxLayoutAlign="start stretch">
+  <div class="img-container">
+    <img [src]="vehicleLocation?.vehicle.foto" />
+  </div>
+  <div class="text-container" fxLayout="column" fxLayoutAlign="space-evenly start" >
+    <span class="mat-subheader-1">{{vehicleLocation?.vehicle.make}}</span>
+    <span class="mat-caption">{{vehicleLocation?.vehicle.model}}</span>
+    <span class="mat-body-2">{{(address$ | async)?.display_name}}</span>
+  </div>
+</mat-card>

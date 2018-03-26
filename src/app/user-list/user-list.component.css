@@ -1,4 +1,4 @@
 .list-item {
-  background-color: #fcfcfc;
-  padding: 5px 10px;
+  margin: 4px;
+  cursor: pointer;
 }

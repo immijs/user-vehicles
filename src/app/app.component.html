@@ -1,12 +1,13 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div fxLayout="column" fxLayoutAlign="start stretch" fxFill>
-  <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center">
-    <button mat-icon-button color="primary" routerLink="/users">
+<div fxLayout="column" fxFlexFill>
+  <mat-toolbar fxLayout="row" fxLayoutAlign="space-between center" style="min-height:64px;">
+    <button mat-icon-button routerLink="/users">
       <mat-icon aria-label="Return home">home</mat-icon>
     </button>
-    <button mat-icon-button color="primary" routerLink="/log">
+    <button mat-icon-button routerLink="/log">
       <mat-icon aria-label="Show messages">history</mat-icon>
     </button>
   </mat-toolbar>
-  <router-outlet fxFlex></router-outlet>
+  <div fxFlex>
+    <router-outlet></router-outlet>
+  </div>
 </div>

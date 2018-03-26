@@ -1,4 +1,8 @@
-<div *ngIf="owner != null" class="container">
-    <h4>{{owner?.name}} {{owner?.surname}}</h4>
-    <img [src]="owner.foto" class="profile-picture" />
+<div *ngIf="owner != null" fxFlex>
+  <div class="img-container" fxFlexLayout="row" fxLayoutAlignment="center">
+    <img [src]="owner.foto" />
+  </div>
+  <div class="text-container" fxLayout="column" fxLayoutAlign="space-evenly start">
+    <span class="mat-title">{{owner.name}} {{owner.surname}}</span>
+  </div>
 </div>

@@ -45,8 +45,10 @@ export class UserListService {
       return this.userListCache.item;
     }
     catch (e) {
-      console.error(e);
+      this.userListCache = null;
+
       this.messageService.addDisplayMessage(new Message(`failed reading user list`));
+      console.error(e);
     }
   }
 
