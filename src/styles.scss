@@ -2,8 +2,8 @@
 
 @include mat-core();
 
-$vehicle-map-primary: mat-palette($mat-red, 700, 300, 900);
-$vehicle-map-accent: mat-palette($mat-grey, 200, 100, 400);
+$vehicle-map-primary: mat-palette($mat-grey, 700, 300, 900);
+$vehicle-map-accent: mat-palette($mat-green, 200, 100, 400);
 
 $vehicle-map-theme: mat-light-theme($vehicle-map-primary, $vehicle-map-accent);
 @include angular-material-theme($vehicle-map-theme);
@@ -24,21 +24,13 @@ user-list, user-details {
   max-height: 100%;
 }
 
-.round-image {
-  border-radius: 25px;
-  height: 50px;
-  width: 50px;
-  object-fit: cover;
-}
-
-
 .img-container {
   width: 100%;
   height: auto;
 }
 
 .img-container img {
-  max-width: 100%;
+  width: 100%;
   height: auto;
 }
 

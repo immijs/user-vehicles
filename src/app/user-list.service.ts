@@ -37,7 +37,11 @@ export class UserListService {
           expires: time,
           item: this.http.get<{ data: User[] }>(url)
             .retry(3)
-            .map(o => o.data.filter(u => u.userid != null))
+            .map(o => o.data.filter(u => u.userid != null)
+              .map(u => {
+              Object.assign(u, User.prototype);
+                return u;
+              }))
             .publishReplay(1, this.userListExpiryMilliseconds)
             .refCount()
         };

@@ -32,6 +32,7 @@ import { MessageService } from '../message.service';
 import { locateHostElement } from '@angular/core/src/render3/instructions';
 import { OverlayPositioning } from 'openlayers';
 import { VehicleListComponent } from '../vehicle-list/vehicle-list.component';
+import fill from 'ol/style/fill';
 
 @Component({
   selector: 'vehicle-map',
@@ -39,6 +40,7 @@ import { VehicleListComponent } from '../vehicle-list/vehicle-list.component';
   styleUrls: ['./vehicle-map.component.css']
 })
 export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
+
   private vehicleLocationString = 'vehicle-location';
   private map: OlMap;
   private source: OlOSM;
@@ -48,7 +50,6 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
   private locationsVector: OlLayerVector;
   private highlightStyle: OlStyleStyle;
   public highlightedLocation: VehicleLocation;
-  //public selectedVehicle: Vehicle;
 
   private vehicleSelected$: Subject<Vehicle>;
   private vehiclePullTimer$: Subscription;
@@ -178,7 +179,8 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
 
     let coordinate = OlProj.fromLonLat([vehicleLocation.lon, vehicleLocation.lat]);
 
-    this.view.animate({ center: coordinate, zoom: 12 }, (b: boolean) => {
+    let targetZoom = Math.max(this.view.getZoom(), 12);
+    this.view.animate({ center: coordinate, zoom: targetZoom, duration: 450 }, (b: boolean) => {
       this.highlightedLocation = vehicleLocation;
       let feature = this.findVehicleLocationFeature(vehicleLocation);
 
@@ -208,33 +210,14 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
     let coordinate = OlProj.fromLonLat([location.lon, location.lat]);
     let pixel = this.map.getPixelFromCoordinate(coordinate);
     let features: OlFeature[] = this.map.getFeaturesAtPixel(pixel) as OlFeature[];
-    if (features != null && features.length > 0) {
-      return features[0];
+    if (features != null) {
+      let vehicleFeatures = features.filter(f => f.getId() == location.vehicleid);
+
+      if (vehicleFeatures.length > 0)
+        return vehicleFeatures[0];
     }
-    else
-      return null;
-  }
 
-  private getVehicleStyle(vehicle: Vehicle): OlStyleStyle {
-    if (this.highlightedLocation != null && vehicle == this.highlightedLocation.vehicle)
-      return this.highlightStyle;
-    else
-      return this.getVehicleOriginalStyle(vehicle);
-  }
-
-  private getVehicleOriginalStyle(vehicle: Vehicle): OlStyleStyle {
-    return new OlStyleStyle({
-      image: new OlStyleCircle({
-        radius: 6,
-        fill: new OlStyleFill({
-          color: vehicle.color
-        }),
-        stroke: new OlStyleStroke({
-          color: '#fff',
-          width: 2
-        })
-      })
-    });
+    return null;
   }
 
   private getPopupPositioning(pixel): OverlayPositioning {
@@ -259,5 +242,48 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
     feature.setGeometry(new OlGeomPoint(coordinate));
 
     return feature;
+  }
+
+  private getVehicleStyle(vehicle: Vehicle): OlStyleStyle {
+    if (this.highlightedLocation != null && vehicle == this.highlightedLocation.vehicle)
+      return this.highlightStyle;
+    else
+      return this.getVehicleOriginalStyle(vehicle);
+  }
+
+  private getVehicleOriginalStyle(vehicle: Vehicle): OlStyleStyle {
+    return new OlStyleStyle({
+      image: new OlStyleCircle({
+        radius: 6,
+        fill: new OlStyleFill({
+          color: vehicle.color
+        }),
+        stroke: new OlStyleStroke({
+          color: this.getBorderColor(vehicle.color),
+          width: 2
+        })
+      })
+    });
+  }
+  private getBorderColor(fillHex: string): [number, number, number, number] {
+    let rgb = this.hexToRgb(fillHex);
+    let c = rgb[0] > 127 && rgb[1] > 127 && rgb[2] > 127 ? 0.75 : 1.25;
+    return [rgb[0] * c, rgb[1] * c, rgb[2] * c, 1];
+  }
+
+  private hexToRgb(hex): [number, number, number] {
+    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+      return r + r + g + g + b + b;
+    });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ?
+      [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+      ] : null;
   }
 }

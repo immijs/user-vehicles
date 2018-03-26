@@ -1,10 +1,18 @@
 <mat-card class="container" fxLayout="column" fxFlex fxLayoutGap="20px">
-  <h3 mat-subheader>Users</h3>
+  <span class="mat-display-1">Users</span>
   <div *ngFor='let user of userList$ | async' routerLink="/user/{{user.userid}}" fxLayoutGap="5px">
     <div class="list-item" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-      <img class="round-image" [src]="user.owner.foto">
-      <span> {{user?.owner?.name}} {{user?.owner?.surname}} </span>
-      <span> {{user?.vehicles?.length}} vehicle(s) </span>
+      <div >
+        <img class="list-image" [src]="user.owner.foto">
+      </div>
+      <div fxLayout="column" fxLayoutAlign="center stretch" fxFlex>
+        <span class="mat-title"> {{user?.owner?.name}} {{user?.owner?.surname}} </span>
+        <div fxLayout="row">
+          <span style="min-width: 80px" class="mat-caption"> {{user?.vehicleCount()}} </span>
+          <span class="mat-caption"> {{user?.vehicleDescription()}} </span>
+        </div>
+      </div>
     </div>
+    <mat-divider></mat-divider>
   </div>
 </mat-card>
