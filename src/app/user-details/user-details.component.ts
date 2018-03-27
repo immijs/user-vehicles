@@ -17,7 +17,7 @@ import { OwnerComponent } from '../owner/owner.component';
   styleUrls: ['./user-details.component.css']
 })
 export class UserDetailsComponent implements OnInit {
-  private user$: Observable<User>;
+  public user$: Observable<User>;
 
   constructor(private route: ActivatedRoute, private router: Router, private userListService: UserListService, private messageService: MessageService) {
   }

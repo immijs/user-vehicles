@@ -15,7 +15,7 @@ import { User } from '../shared/user.model';
   styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
-  private userList$: Observable<User[]>;
+  public userList$: Observable<User[]>;
 
   constructor(private userListService: UserListService, private messageService: MessageService) {
   }
