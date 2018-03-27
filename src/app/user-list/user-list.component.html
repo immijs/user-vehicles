@@ -2,7 +2,7 @@
   <span class="mat-display-1">Users</span>
   <div *ngFor='let user of userList$ | async' routerLink="/user/{{user.userid}}" fxLayoutGap="5px">
     <div class="list-item" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-      <div >
+      <div>
         <img class="list-image" [src]="user.owner.foto">
       </div>
       <div fxLayout="column" fxLayoutAlign="center stretch" fxFlex>

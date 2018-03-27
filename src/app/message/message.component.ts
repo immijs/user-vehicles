@@ -13,10 +13,10 @@ import { Message } from '../shared/message.model';
 export class MessageComponent implements OnInit {
   public messages$: Observable<Message[]>;
 
-  constructor(public messageService: MessageService) { }
+  constructor(public messageService: MessageService) {
+  }
 
   ngOnInit() {
     this.messages$ = this.messageService.getMessages();
   }
-
 }

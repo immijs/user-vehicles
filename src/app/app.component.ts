@@ -12,7 +12,6 @@ import { Message } from './shared/message.model';
 export class AppComponent implements OnInit {
 
   constructor(public snackBar: MatSnackBar, private messageService: MessageService) {
-
   }
 
   ngOnInit(): void {

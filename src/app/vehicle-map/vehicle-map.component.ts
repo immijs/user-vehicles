@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, OnChanges, AfterViewChecked } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
@@ -12,9 +12,9 @@ import OlGeomPoint from 'ol/geom/point';
 import OlLayerTile from 'ol/layer/tile';
 import OlLayerVector from 'ol/layer/vector';
 import OlMap from 'ol/map';
-import OlProj from 'ol/proj';
 import OlOSM from 'ol/source/osm';
 import OlOverlay from 'ol/overlay';
+import OlProj from 'ol/proj';
 import OlSourceVector from 'ol/source/vector';
 import OlStyleCircle from 'ol/style/circle';
 import OlStyleFill from 'ol/style/fill';
@@ -30,17 +30,14 @@ import { VehicleLocation } from '../shared/vehicle-location.model';
 import { Message } from '../shared/message.model';
 import { MessageService } from '../message.service';
 import { locateHostElement } from '@angular/core/src/render3/instructions';
-import { OverlayPositioning } from 'openlayers';
 import { VehicleListComponent } from '../vehicle-list/vehicle-list.component';
-import fill from 'ol/style/fill';
 
 @Component({
   selector: 'vehicle-map',
   templateUrl: './vehicle-map.component.html',
   styleUrls: ['./vehicle-map.component.css']
 })
-export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
-
+export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy, AfterViewChecked {
   private vehicleLocationString = 'vehicle-location';
   private map: OlMap;
   private source: OlOSM;
@@ -65,43 +62,57 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
   ngOnChanges(): void {
     if (this.user != null) {
       this.vehiclePullTimer$ = Observable.timer(0, this.pullInterval).subscribe(() => {
-        this.pullLocations();
+        this.readLocations();
       });
     }
+
+    if (this.map != null)
+      this.map.updateSize();
   }
 
-  private pullLocations() {
-    this.vehicleService.getUserVehicleLocations(this.user.userid).subscribe((locations) => {
-      this.vehicleLocations = locations;
-      let locationFeatures = locations.map(location => {
-        location.vehicle = this.user.vehicles.find(v => v.vehicleid == location.vehicleid);
-        return this.getVehicleLocationFeature(location);
+  ngOnInit() {
+    this.initMap();
+    this.initVehicleSelected();
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.map != null)
+      this.map.updateSize();
+  }
+
+  private readLocations() {
+    try {
+      this.vehicleService.getUserVehicleLocations(this.user.userid).subscribe((locations) => {
+        this.vehicleLocations = locations;
+        let locationFeatures = locations.map(location => {
+          location.vehicle = this.user.vehicles.find(v => v.vehicleid == location.vehicleid);
+          return this.getVehicleLocationFeature(location);
+        });
+
+        this.locationsVector.setSource(new OlSourceVector({
+          features: locationFeatures
+        }));
+
+        if (this.highlightedLocation == null) {
+          let extent = this.locationsVector.getSource().getExtent();
+          this.map.getView().fit(extent, { size: this.map.getSize(), maxZoom: 10 });
+        }
+        else {
+          this.highlightedLocation = this.getVehicleLocation(this.highlightedLocation.vehicleid);
+          setTimeout(() => {
+            this.vehicleService.selectVehicle(this.highlightedLocation.vehicle);
+          }, 1);
+        }
       });
-
-      this.locationsVector.setSource(new OlSourceVector({
-        features: locationFeatures
-      }));
-
-      if (this.highlightedLocation == null) {
-        let extent = this.locationsVector.getSource().getExtent();
-        this.map.getView().fit(extent, { size: this.map.getSize(), maxZoom: 11 });
-      }
-      else {
-        this.highlightedLocation = this.getVehicleLocation(this.highlightedLocation.vehicleid);
-        setTimeout(() => {
-          this.vehicleService.selectVehicle(this.highlightedLocation.vehicle);
-        }, 1);
-      }
-    });
+    }
+    catch (e) {
+      console.error(e);
+      this.messageService.addDisplayMessage(new Message(`Failed reading vehicle locations.`));
+    }
   }
 
   private getVehicleLocation(vehicleid: number): VehicleLocation {
     return this.vehicleLocations.find(v => v.vehicleid == vehicleid);
-  }
-
-  ngOnInit() {
-    this.initVehicleSelected();
-    this.initMap();
   }
 
   private initMap() {
@@ -130,7 +141,7 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
       element: document.getElementById('popup')
     });
     this.map.addOverlay(this.popup);
-
+    
     this.map.on('click', (event) => this.mapClicked(event));
 
     this.highlightStyle = new OlStyleStyle({
@@ -140,8 +151,8 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
           color: '#ffff00'
         }),
         stroke: new OlStyleStroke({
-          color: '#9B9B00',
-          width: 2
+          color: '#f00',
+          width: 1
         })
       })
     });
@@ -151,32 +162,32 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
     this.vehicleSelected$ = this.vehicleService.vehicleSelected.subscribe((vehicle: Vehicle) => {
       let vehicleLocation = this.getVehicleLocation(vehicle.vehicleid);
 
+      if (this.highlightedLocation != null) {
+        this.clearHighlightedLocation();
+      }
+
       if (vehicleLocation != null) {
         this.highlightVehicle(vehicleLocation);
       }
       else {
-        this.messageService.addDisplayMessage(new Message(`could not find location of vehicle (vehicleid:${vehicle.vehicleid})`));
+        this.messageService.addDisplayMessage(new Message(`Location of vehicle (vehicleid:${vehicle.vehicleid}) not found.`));
       }
     });
   }
 
   private mapClicked(event): void {
+    if (this.highlightedLocation != null) {
+      this.clearHighlightedLocation();
+    }
+
     let features: OlFeature[] = this.map.getFeaturesAtPixel(event.pixel) as OlFeature[];
     if (features != null && features.length > 0) {
       let vehicleLocation = features[0][this.vehicleLocationString];
       this.highlightVehicle(vehicleLocation);
     }
-    else if (this.highlightedLocation != null) {
-      this.popup.setPosition(undefined);
-      this.clearSelectedVehicleStyle();
-    }
   }
 
   private highlightVehicle(vehicleLocation: VehicleLocation) {
-    if (this.highlightedLocation != null) {
-      this.clearSelectedVehicleStyle();
-    }
-
     let coordinate = OlProj.fromLonLat([vehicleLocation.lon, vehicleLocation.lat]);
 
     let targetZoom = Math.max(this.view.getZoom(), 12);
@@ -193,17 +204,19 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
 
       let pixel = this.map.getPixelFromCoordinate(coordinate);
 
-      this.popup.setPositioning(this.getPopupPositioning(pixel));
+      this.popup.setPositioning('center-left');
       this.popup.setPosition(coordinate);
     });
   }
 
-  private clearSelectedVehicleStyle() {
+  private clearHighlightedLocation() {
     let selectedFeature = this.findVehicleLocationFeature(this.highlightedLocation);
     if (selectedFeature != null) {
       let vehicleStyle = this.getVehicleOriginalStyle(this.highlightedLocation.vehicle);
       selectedFeature.setStyle(vehicleStyle);
     }
+
+    this.popup.setPosition(undefined);
   }
 
   private findVehicleLocationFeature(location: VehicleLocation): OlFeature {
@@ -218,10 +231,6 @@ export class VehicleMapComponent implements OnChanges, OnInit, OnDestroy {
     }
 
     return null;
-  }
-
-  private getPopupPositioning(pixel): OverlayPositioning {
-    return 'center-left';
   }
 
   ngOnDestroy() {

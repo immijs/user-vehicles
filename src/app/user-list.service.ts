@@ -1,9 +1,9 @@
-import { Injectable, Output, EventEmitter } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
-import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/publishReplay';
 import 'rxjs/add/operator/retry';
 import 'rxjs/add/operator/take';
 
@@ -19,7 +19,8 @@ export class UserListService {
   private readonly userListExpiryMilliseconds: number = 5 * 60 * 1000;
   private userListCache: CacheItem<Observable<User[]>>;
 
-  constructor(private http: HttpClient, private messageService: MessageService) { }
+  constructor(private http: HttpClient, private messageService: MessageService) {
+  }
 
   getUserList(): Observable<User[]> {
     try {
@@ -39,7 +40,7 @@ export class UserListService {
             .retry(3)
             .map(o => o.data.filter(u => u.userid != null)
               .map(u => {
-              Object.assign(u, User.prototype);
+                Object.assign(u, User.prototype);
                 return u;
               }))
             .publishReplay(1, this.userListExpiryMilliseconds)
@@ -51,8 +52,9 @@ export class UserListService {
     catch (e) {
       this.userListCache = null;
 
-      this.messageService.addDisplayMessage(new Message(`failed reading user list`));
+      this.messageService.addMessage(new Message(`failed reading user list`));
       console.error(e);
+      throw e;
     }
   }
 
@@ -71,8 +73,9 @@ export class UserListService {
       });
     }
     catch (e) {
-      this.messageService.addDisplayMessage(new Message(`failed reading user (userid:${userid})`));
+      this.messageService.addMessage(new Message(`failed reading user (userid:${userid})`));
       console.error(e);
+      throw e;
     }
   }
 }

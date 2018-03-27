@@ -27,6 +27,7 @@ export class VehicleService {
 
   public getUserVehicleLocations(userid: number): Observable<VehicleLocation[]> {
     this.messageService.addMessage(new Message(`vehicle locations requested (userid:${userid})`));
+
     let url: string = `http://mobi.connectedcar360.net/api/?op=getlocations&userid=${userid}`;
 
     try {
@@ -56,13 +57,21 @@ export class VehicleService {
       if (this.vehicleLocationCache.has(url))
         this.vehicleLocationCache.delete(url);
 
-      this.messageService.addDisplayMessage(new Message(`failed reading vehicle locations (userid:${userid})`));
+      this.messageService.addMessage(new Message(`failed reading vehicle locations (userid:${userid})`));
       console.error(e);
+      throw e;
     }
   }
 
   public getAddress(lat: number, lon: number): Observable<Address> {
-    let url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=0&lat=${lat}&lon=${lon}`;
-    return this.http.get<Address>(url);
+    try {
+      let url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=0&lat=${lat}&lon=${lon}`;
+      return this.http.get<Address>(url);
+    }
+    catch (e) {
+      this.messageService.addMessage(new Message(`Failed reading address`));
+      console.error(e);
+      throw e;
+    }
   }
 }

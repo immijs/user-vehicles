@@ -1,3 +1,8 @@
 .overlay-container {
   width: 300px;
 }
+
+
+.address {
+  min-height: 75px;
+}

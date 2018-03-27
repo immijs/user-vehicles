@@ -1,11 +1,15 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { of } from 'rxjs/observable/of';
+import 'rxjs/add/operator/catch';
 
+import { MessageService } from '../message.service';
 import { UserListService } from '../user-list.service';
-import { OwnerComponent } from '../owner/owner.component';
+import { Message } from '../shared/message.model';
 import { User } from '../shared/user.model';
+import { OwnerComponent } from '../owner/owner.component';
 
 @Component({
   selector: 'user-details',
@@ -15,10 +19,18 @@ import { User } from '../shared/user.model';
 export class UserDetailsComponent implements OnInit {
   private user$: Observable<User>;
 
-  constructor(private route: ActivatedRoute, private userListService: UserListService) { }
+  constructor(private route: ActivatedRoute, private router: Router, private userListService: UserListService, private messageService: MessageService) {
+  }
 
   ngOnInit(): void {
     const id = parseInt(this.route.snapshot.paramMap.get('id'));
-    this.user$ = this.userListService.getUser(id);
+
+    this.user$ = this.userListService.getUser(id)
+      .catch((e) => {
+        console.error(e);
+        this.messageService.addDisplayMessage(new Message(`User not found (id:${this.route.snapshot.paramMap.get('id')})`));
+        this.router.navigate(['/']);
+        return of(e);
+      });;
   }
 }
